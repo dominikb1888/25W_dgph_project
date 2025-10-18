@@ -1,0 +1,21 @@
+h1 {
+  color: green;
+}
+
+h2 {
+  text-decoration: underline;
+  color: green;
+}
+
+div h2 {
+  color: pink;
+  text-decoration: none;
+}
+
+.plaintext {
+  font-family: Courier;
+}
+
+#first {
+  font-size: 90px;
+}
