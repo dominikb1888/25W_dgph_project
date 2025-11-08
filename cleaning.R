@@ -3,6 +3,9 @@ pacman::p_load(
   here,       # relative file pathways  
   janitor,    # data cleaning and tables
   lubridate,  # working with dates
+  parsedate,  # has function to "guess" messy dates
+  aweek,      # another option for converting dates to weeks, and weeks to dates
+  zoo,        # additional date/time functions
   matchmaker, # dictionary-based cleaning
   epikit,     # age_categories() function
   tidyverse,   # data management and visualization
@@ -37,13 +40,15 @@ linelist <- linelist_raw %>%
   mutate(
     bmi = wt_kg / (ht_cm/100)^2,
     new_var_paste = stringr::str_glue("This Patient came to {hospital} on ({date_hospitalisation})"),
-    # split = stringr::str_split_1(new_var_paste, "on")
-    ) %>%
+  ) %>%  
+  
 
   # convert class of columns
   mutate(across(contains("date"), as.Date), 
          generation = as.numeric(generation),
          age        = as.numeric(age)) %>% 
+  
+  #separate(new_var_paste, into = c("split_hospital", "split_date_hospitalization"), sep = "on", extra = "drop") %>%
   
   # add column: delay to hospitalisation
   mutate(days_onset_hosp = as.numeric(date_hospitalisation - date_onset)) %>%
@@ -63,6 +68,11 @@ linelist <- linelist_raw %>%
   ) %>%
   
   mutate(hospital = replace_na(hospital, "Missing")) %>% 
+  
+  mutate(hospital_factor = fct_other(                      # adjust levels
+         linelist$hospital,
+         keep = c("Port Hospital", "Central Hospital", "Missing"),  # keep these separate
+         other_level = "Other Hospital")) %>%
   
   # create age_years column (from age and age_unit)
   mutate(age_years = case_when(
