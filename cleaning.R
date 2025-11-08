@@ -52,4 +52,19 @@ linelist <- linelist_raw %>%
                       "other"             = "Other",
                       "St. Marks Maternity Hopital (SMMH)" = "St. Mark's Maternity Hospital (SMMH)"
     )
-  )
+  ) %>%
+  
+  mutate(hospital = replace_na(hospital, "Missing")) %>% 
+  
+  # create age_years column (from age and age_unit)
+  mutate(age_years = case_when(
+    age_unit == "years" ~ age,
+    age_unit == "months" ~ age/12,
+    is.na(age_unit) ~ age)) %>% 
+  
+  mutate(
+    # age categories: custom
+    age_cat = epikit::age_categories(age_years, breakers = c(0, 5, 10, 15, 20, 30, 50, 70)),
+    
+    # age categories: 0 to 85 by 5s
+    age_cat5 = epikit::age_categories(age_years, breakers = seq(0, 85, 5)))
