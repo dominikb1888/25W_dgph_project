@@ -23,6 +23,17 @@ linelist <- linelist_raw %>%
   ## Rename Column Names ---------------------
   rename(date_infection       = infection_date,
          date_hospitalisation = hosp_date,
-         date_outcome         = date_of_outcome) %>%
+         date_outcome         = date_of_outcome)  %>%
   
-  distinct()
+  
+  
+  ## Deduplicate Data
+  distinct() %>%
+
+  ## Remove unnecessary columns
+  select(-c(date_onset, fever:vomit)) %>%
+  
+  ## Compute new columns 
+  mutate(
+    bmi = wt_kg / (ht_cm/100)^2
+    )
