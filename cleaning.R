@@ -35,5 +35,21 @@ linelist <- linelist_raw %>%
   
   ## Compute new columns 
   mutate(
-    bmi = wt_kg / (ht_cm/100)^2
+    bmi = wt_kg / (ht_cm/100)^2,
+    new_var_paste = stringr::str_glue("This Patient came to {hospital} on ({date_hospitalisation})"),
+    # split = stringr::str_split_1(new_var_paste, "on")
+    ) %>%
+
+  ## Mutate hospital name values
+  mutate(
+    hospital = recode(hospital,
+                      # for reference: OLD = NEW
+                      "Mitylira Hopital"  = "Military Hospital",
+                      "Mitylira Hospital" = "Military Hospital",
+                      "Military Hopital"  = "Military Hospital",
+                      "Port Hopital"      = "Port Hospital",
+                      "Central Hopital"   = "Central Hospital",
+                      "other"             = "Other",
+                      "St. Marks Maternity Hopital (SMMH)" = "St. Mark's Maternity Hospital (SMMH)"
     )
+  )
