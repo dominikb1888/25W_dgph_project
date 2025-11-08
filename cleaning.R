@@ -31,7 +31,7 @@ linelist <- linelist_raw %>%
   distinct() %>%
 
   ## Remove unnecessary columns
-  select(-c(date_onset, fever:vomit)) %>%
+  # select(-c(fever:vomit)) %>%
   
   ## Compute new columns 
   mutate(
@@ -40,6 +40,14 @@ linelist <- linelist_raw %>%
     # split = stringr::str_split_1(new_var_paste, "on")
     ) %>%
 
+  # convert class of columns
+  mutate(across(contains("date"), as.Date), 
+         generation = as.numeric(generation),
+         age        = as.numeric(age)) %>% 
+  
+  # add column: delay to hospitalisation
+  mutate(days_onset_hosp = as.numeric(date_hospitalisation - date_onset)) %>%
+  
   ## Mutate hospital name values
   mutate(
     hospital = recode(hospital,
