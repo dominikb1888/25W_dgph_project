@@ -30,30 +30,30 @@ linelist <- linelist_raw %>%
   
   
   
-  ## Deduplicate Data
+  ## Deduplicate Data -------------------------------
   distinct() %>%
 
-  ## Remove unnecessary columns
+  ## Remove unnecessary columns ---------------------
   # select(-c(fever:vomit)) %>%
   
-  ## Compute new columns 
+  ## Compute new columns ----------------------------
   mutate(
     bmi = wt_kg / (ht_cm/100)^2,
     new_var_paste = stringr::str_glue("This Patient came to {hospital} on ({date_hospitalisation})"),
   ) %>%  
   
 
-  # convert class of columns
+  ## convert class of columns ------------------------
   mutate(across(contains("date"), as.Date), 
          generation = as.numeric(generation),
          age        = as.numeric(age)) %>% 
   
   #separate(new_var_paste, into = c("split_hospital", "split_date_hospitalization"), sep = "on", extra = "drop") %>%
   
-  # add column: delay to hospitalisation
+  ## add column: delay to hospitalisation ----------------------------
   mutate(days_onset_hosp = as.numeric(date_hospitalisation - date_onset)) %>%
   
-  ## Mutate hospital name values
+  ## Mutate hospital name values -------------------------------------
   mutate(
     hospital = recode(hospital,
                       # for reference: OLD = NEW
@@ -70,7 +70,7 @@ linelist <- linelist_raw %>%
   mutate(hospital = replace_na(hospital, "Missing")) %>% 
   
   mutate(hospital_factor = fct_other(                      # adjust levels
-         linelist$hospital,
+         hospital,
          keep = c("Port Hospital", "Central Hospital", "Missing"),  # keep these separate
          other_level = "Other Hospital")) %>%
   
@@ -86,3 +86,9 @@ linelist <- linelist_raw %>%
     
     # age categories: 0 to 85 by 5s
     age_cat5 = epikit::age_categories(age_years, breakers = seq(0, 85, 5)))
+
+linelist_vis <- linelist %>%
+  mutate(
+    hospital_ord = fct_infreq(hospital_factor)
+  ) %>%
+  filter(! hospital_ord %in% c("Missing","Other"))
